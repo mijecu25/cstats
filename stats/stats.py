@@ -7,7 +7,7 @@ Usage:
     stats -h | --help
 
 Options:
-  -h --help        Show this screen.
+  -h --help     Show this screen.
   --version     Show version.
 """
 
@@ -19,7 +19,7 @@ import os
 from docopt import docopt
 
 __author__ = 'Miguel Velez'
-__version__ = '0.1.1'
+__version__ = '0.1.2.1'
 
 
 def _list_files(path):
