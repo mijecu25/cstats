@@ -1,6 +1,5 @@
 # stats
 
-[![Build Status](https://travis-ci.org/mijecu25/stats.svg?branch=master)](https://travis-ci.org/mijecu25/stats)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/mijecu25/stats/master/LICENSE)
 
 ===========
