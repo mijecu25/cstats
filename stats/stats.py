@@ -7,10 +7,10 @@ Usage:
     stats (s | size) [<path>]
     stats -h | --help
     stats -v | --version
-
 Options:
   -h --help     Show this screen.
   -v --version     Show version.
+
 """
 
 # Refer to http://docopt.org/ for documentation on how to structure the docopt
