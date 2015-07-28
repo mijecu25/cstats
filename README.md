@@ -7,6 +7,7 @@
 [![PyPI](https://img.shields.io/pypi/dm/cstats.svg)](https://pypi.python.org/pypi/cstats)
 
 Stats generates information about your file directory
+
 ===========
 
 The MIT License (MIT)
