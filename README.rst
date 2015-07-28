@@ -7,10 +7,18 @@ stats
 .. image:: https://img.shields.io/pypi/v/nine.svg   
    :target: https://pypi.python.org/pypi/cstats
    
+.. image:: https://img.shields.io/pypi/pyversions/cstats.svg
+   :target: https://pypi.python.org/pypi/cstats
+   
+.. image:: https://img.shields.io/pypi/status/cstats.svg   
+   :target: https://pypi.python.org/pypi/cstats
+   
 .. image:: https://img.shields.io/pypi/dm/cstats.svg
    :target: https://pypi.python.org/pypi/cstats
    
 Stats generates information about your file directory
+
+-----------------
 
 The MIT License (MIT)
 
