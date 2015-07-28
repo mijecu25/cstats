@@ -1,8 +1,8 @@
 # stats
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/mijecu25/stats/master/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/cstats.svg)]()
-[![PyPI](https://img.shields.io/pypi/dm/cstats.svg)]()
+[![PyPI](https://img.shields.io/pypi/v/cstats.svg)](https://pypi.python.org/pypi/cstats)
+[![PyPI](https://img.shields.io/pypi/dm/cstats.svg)](https://pypi.python.org/pypi/cstats)
 
 ===========
 
