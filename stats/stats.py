@@ -13,8 +13,6 @@ Options:
 
 """
 
-# Refer to http://docopt.org/ for documentation on how to structure the docopt
-
 import sys as system
 import time
 import os
@@ -90,7 +88,7 @@ def get_size_directory(path):
     # Loop through each file
     for entry in files:
         # Get the information of the file
-        file_info = _get_entry_info(entry)
+        file_info = _get_entry_info(entry, path)
 
         # If there is no file info
         if file_info is None:
@@ -108,10 +106,13 @@ def get_size_directory(path):
 
 
 # Main method
-def main(args):
+def main():
     """
     Main Method of the stats program.
     """
+
+    # Get optional arguments for path
+    args = system.argv[2:]
 
     # Get the arguments from docopt
     arguments = docopt(__doc__, version=('stats ' + __version__))
@@ -128,10 +129,14 @@ def main(args):
 
     # If the user wants the size of the directory
     elif arguments['s'] or arguments['size']:
-        # Pass the current path
-        get_size_directory('.')
+        if len(args) == 0:
+            # Pass the current path
+            get_size_directory('.')
+        else:
+            # Else, pass the path provided by the user
+            get_size_directory(args[0])
 
 
 # Start the program
 if __name__ == '__main__':
-    main(system.argv[2:])
+    main()
