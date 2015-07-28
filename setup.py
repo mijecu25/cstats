@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='stats',
+    name='cstats',
     version='0.1.2',
     description='Stats generates information about your file directory.',
     long_description=open('README.rst').read(),
