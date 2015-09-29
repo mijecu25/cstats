@@ -1,4 +1,4 @@
-stats
+cstats
 ====================
 
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg 
@@ -16,9 +16,9 @@ stats
 .. image:: https://img.shields.io/pypi/dm/cstats.svg
    :target: https://pypi.python.org/pypi/cstats
    
-Stats generates information about your file directory
+cstats generates information about your file directory
 
------------------
+----
 
 The MIT License (MIT)
 
