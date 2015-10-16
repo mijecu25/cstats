@@ -3,9 +3,9 @@ from setuptools import setup, find_packages
 setup(
     name='cstats',
     version='0.1.2',
-    description='Stats generates information about your file directory.',
+    description='Cstats generates information about your file directory.',
     long_description=open('README.rst').read(),
-    url='https://github.com/mijecu25/stats',
+    url='https://github.com/mijecu25/cstats',
     author='Miguel Velez',
     author_email='miguelvelez@mijecu25.com',
     license='MIT',
@@ -25,7 +25,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'stats=stats.stats:main'
+            'cstats=cstats.cstats:main'
         ],
     }
 )

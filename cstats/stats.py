@@ -1,12 +1,12 @@
-r"""STATS
+r"""CSTATS
 
-stats provides statistic and information about your directories
+cstats provides statistic and information about your directories
 
 Usage:
-    stats (ls | list) [<path>]
-    stats (s | size) [<path>]
-    stats -h | --help
-    stats -v | --version
+    cstats (ls | list) [<path>]
+    cstats (s | size) [<path>]
+    cstats -h | --help
+    cstats -v | --version
 Options:
   -h --help     Show this screen.
   -v --version     Show version.
@@ -20,7 +20,7 @@ import os
 from docopt import docopt
 
 __author__ = 'Miguel Velez'
-__version__ = '0.1.2.3'
+__version__ = '0.1.3.1'
 
 
 def _get_entry_info(entry, path):
@@ -35,12 +35,12 @@ def _get_entry_info(entry, path):
         path = path[:-1]
 
     # Try
-    try:
-        # Get information and attributes from the entry in the path
-        info = os.stat(path + '/' + entry)
-    except WindowsError:
-        # The might be some windows error, so set the result to None
-        info = None
+    # try:
+    #     # Get information and attributes from the entry in the path
+    #     info = os.stat(path + '/' + entry)
+    # except WindowsError:
+    #     # The might be some windows error, so set the result to None
+    #     info = None
 
     # Return the information
     return info
@@ -108,14 +108,14 @@ def get_size_directory(path):
 # Main method
 def main():
     """
-    Main Method of the stats program.
+    Main Method of the cstats program.
     """
 
     # Get optional arguments for path
     args = system.argv[2:]
 
     # Get the arguments from docopt
-    arguments = docopt(__doc__, version=('stats ' + __version__))
+    arguments = docopt(__doc__, version=('cstats ' + __version__))
 
     # If the user wants to list the files
     if arguments['ls'] or arguments['list']:
