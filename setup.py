@@ -25,7 +25,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'cstats=cstats.cstats:main'
+            'cst=cstats.cstats:main'
         ],
     }
 )
