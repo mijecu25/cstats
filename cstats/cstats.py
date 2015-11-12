@@ -42,7 +42,7 @@ __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
 
 
-def _get_entry_info(entry, path):
+def _get_entry_info(path, entry):
     """
     Get information and attributes from the entry in the
     specified path.
@@ -56,14 +56,12 @@ def _get_entry_info(entry, path):
     # Try
     # try:
     #     # Get information and attributes from the entry in the path
-    #     info = os.stat(path + '/' + entry)
+    info = os.stat(path + '/' + entry)
     # except WindowsError:
     #     # The might be some windows error, so set the result to None
     #     info = None
-
     # Return the information
-    # return info
-    return False
+    return info
 
 
 def list_files(path):
@@ -79,19 +77,21 @@ def list_files(path):
 
     # Loop through each file
     for entry in files:
-        # # Get some file information
-        # file_info = _get_entry_info(entry, path)
-        #
-        # # If there is no file info
-        # if file_info is None:
-        #     # Just jump to the next iteration of the loop
-        #     continue
+        # Get some file information
+        file_info = _get_entry_info(path, entry)
+
+        # If there is no file info
+        if file_info is None:
+            # Just jump to the next iteration of the loop
+            continue
+
+        # print str(file_info)
 
         # Print name, size, created time, modified time
-        print entry.ljust(20)#,\
-            # str(file_info.st_size).ljust(10),\
-            # time.ctime(file_info.st_ctime).ljust(30),\
-            # time.ctime(file_info.st_mtime).ljust(30)
+        print entry.ljust(20),\
+            'size: ' + str(file_info.st_size).ljust(10),\
+            'modified: ' + time.ctime(file_info.st_mtime).ljust(30)
+            # time.ctime(file_info.st_birthtime).ljust(30),\
 
 
 def get_size_directory(path):
@@ -115,7 +115,7 @@ def get_size_directory(path):
             # Just jump to the next iteration of the loop
             continue
 
-        # Add the size of the current file to the totla
+        # Add the size of the current file to the total
         total_size += file_info.st_size
 
     # Print the total size of the current directory
@@ -133,14 +133,14 @@ def main():
 
     # Get optional arguments for path
     args = system.argv[2:]
-    print 'Arguments: ' + str(args)
+    # print 'Arguments: ' + str(args)
 
     # Get the arguments from docopt
     arguments = docopt(__doc__, version=__cstats_version)
 
-    print 'Docopt arguments: ' + str(arguments)
+    # print 'Docopt arguments: ' + str(arguments)
 
-    print '\n'
+    # print '\n'
 
     # If the user wants to list the files
     if arguments['ls'] or arguments['list']:
@@ -155,16 +155,6 @@ def main():
         # Print the man page
         print __doc__
 
-    # # If the user wants to list the files
-    # if arguments['ls'] or arguments['list']:
-    #     # If the user did not specify a path
-    #     if len(args) == 0:
-    #         # Pass the current path
-    #         list_files('.')
-    #     else:
-    #         # Else, pass the path provided by the user
-    #         list_files(args[0])
-    #
     # # If the user wants the size of the directory
     # elif arguments['s'] or arguments['size']:
     #     if len(args) == 0:
@@ -178,5 +168,5 @@ def main():
 
 # Start the program
 if __name__ == '__main__':
-    print 'All arguments ' + str(system.argv)
+    # print 'All arguments ' + str(system.argv)
     main()
