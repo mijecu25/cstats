@@ -23,11 +23,12 @@ import time
 import os
 import operator
 import Queue
+import math
 
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.11'
+__version__ = '0.2.0.12'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -47,6 +48,51 @@ __video_extensions = {'webm', 'mkv', 'flv', 'vob', 'ogv', 'ogg', 'drc', 'gif', '
                       'mpeg,' 'm2v', 'svi', '3gp', '3g2', 'mxf', 'roq', 'nsv', 'flv', 'f4v', 'f4p', 'f4a', 'f4b'}
 __file_types = {'Music': __music_extensions, 'Photos': __photo_extensions, 'Documents': __document_extensions, 'Videos':
                 __video_extensions}
+
+
+def _format_size(size):
+    """
+    Format the size value to correct unit in kB, MB, GB, or TB.
+
+    :param value:
+    :return:
+    """
+
+    # Check how many terabytes there are
+    tera_bytes = round(size / math.pow(10, 12), 3)
+
+    # If there are terabytes
+    if tera_bytes >= 0.1:
+        formatted = str(tera_bytes) + ' TB'
+        return formatted
+
+    # Check how many gigabytes there are
+    giga_bytes = round(size / math.pow(10, 9), 3)
+
+    # If there are gigabytes
+    if giga_bytes >= 0.1:
+        formatted = str(giga_bytes) + ' GB'
+        return formatted
+
+    # Check how many megabytes there are
+    mega_bytes = round(size / math.pow(10, 6), 3)
+
+    # If there are megabytes
+    if mega_bytes >= 0.1:
+        formatted = str(mega_bytes) + ' MB'
+        return formatted
+
+    # Check how many kilobytes there are
+    kilo_bytes = round(size / math.pow(10, 9), 3)
+
+    # If there are kilobytes
+    if kilo_bytes >= 0.1:
+        formatted = str(kilo_bytes) + ' kB'
+        return formatted
+
+    # There are less than kilobyte. Return just the value
+    formatted = str(round(size, 3)) + ' bytes'
+    return formatted
 
 
 def _get_entry_info(path, entry):
@@ -164,7 +210,7 @@ def get_size_directory(path, recursive=False):
             total_size += file_info.st_size
 
     # Print the total size of the current directory
-    print 'Size of current directory ' + str(total_size) + ' bytes'
+    print 'Size of current directory ' + _format_size(total_size)
 
     # Return the total size
     return total_size
@@ -173,6 +219,8 @@ def get_size_directory(path, recursive=False):
 def get_file_types(path, recursive=False):
     """
     Get a list of the file types of the specified directory
+
+    :param recursive:
     :param path:
     """
 
@@ -311,6 +359,7 @@ def get_diretory_count(path, recursive=False):
 
 def _list_analysis(args):
     """
+    Run the list analysis.
 
     :param args:
     :return:
@@ -326,6 +375,7 @@ def _list_analysis(args):
 
 def _size_analysis(args, docopt_arguments):
     """
+    Run the size analysis.
 
     :param args:
     :param docopt_arguments:
@@ -352,6 +402,7 @@ def _size_analysis(args, docopt_arguments):
 
 def _type_analysis(args, docopt_arguments):
     """
+    Run the type analysis.
 
     :param args:
     :param docopt_arguments:
@@ -378,6 +429,7 @@ def _type_analysis(args, docopt_arguments):
 
 def _count_analysis(args, docopt_arguments):
     """
+    Run the count analysis.
 
     :param args:
     :param docopt_arguments:
