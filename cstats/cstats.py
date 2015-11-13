@@ -5,6 +5,7 @@ cstats provides statistic and information about your directories
 Usage:
     cstats (ls | list) [<path>]
     cstats (s | size) [-r] [<path>]
+    cstats (c | count) [-r] [<path>]
     cstats (t | type) [<path>]
     cstats (-h | --help)
     cstats --version
@@ -25,7 +26,7 @@ import Queue
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.8'
+__version__ = '0.2.0.9'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -97,7 +98,7 @@ def list_files(path):
 
 def get_size_directory(path, recursive=False):
     """
-    Get the size of the specified directory. The default is to do a not recursive execution. This means that
+    Get the size of the specified directory. The default is to do a non recursive execution. This means that
     the size of the folders represent the size that they take in memory and the contents are not included. If you want
     the contents of directories to be included in the analysis, set the recursive paramater to True.
 
@@ -218,6 +219,62 @@ def get_file_types(path):
     return current_file_types
 
 
+def get_diretory_count(path, recursive=False):
+    """
+    Get the count of the number of files and directories in the specified directory. The default is to do a non
+    recursive execution. This means that the content of the directories is no included in the analysis. If you want
+    the contents of directories to be included in the analysis, set the recursive paramater to True.
+
+    :param recursive:
+    :param path:
+    """
+
+    # If the path ends with a '/'
+    if path[-1:] == '/':
+        # Remove the '/'
+        path = path[:-1]
+
+    # Create a new queue of paths
+    paths = Queue.Queue()
+    # Add the passed path
+    paths.put(path)
+
+    # Variable for the total count
+    total_count = {'Directories': 0, 'Files': 0}
+
+    while not paths.empty():
+        # Get the current path
+        current_path = paths.get()
+
+        # Get the files and directories in the path
+        files = os.listdir(current_path)
+
+        # Loop through each file
+        for entry in files:
+            # If we are doing a recursive call and the current entry is a directory
+            if recursive and os.path.isdir(os.path.join(current_path, entry)):
+                # Put the new path in the paths queue
+                paths.put(current_path + '/' + entry)
+                # Continue to the next iteration of the loop
+
+            # If the entry is a directory
+            if os.path.isdir(os.path.join(current_path, entry)):
+                total_count['Directories'] += 1
+            else:
+                total_count['Files'] += 1
+
+    # Sort the values in the map based on the counter in reverse order
+    sorted_count = sorted(total_count.items(), key=operator.itemgetter(1), reverse=True)
+
+    # For each entry
+    for directory_count in sorted_count:
+        # Print the type and count
+        print directory_count[0] + ' ' + str(directory_count[1])
+
+    # Return the total count of directories and files
+    return total_count
+
+
 # Main method
 def main():
     """
@@ -261,7 +318,7 @@ def main():
             else:
                 # Else, pass the path provided by the user
                 get_size_directory(args[0])
-    # If the user wants alits of the types of files of the directory
+    # If the user wants a lits of the types of files of the directory
     elif arguments['t'] or arguments['type']:
         if len(args) == 0:
             # Pass the current path
@@ -269,6 +326,25 @@ def main():
         else:
             # Else, pass the path provided by the user
             get_file_types(args[0])
+    # If the user wants to count the directories and files inside a directory
+    elif arguments['c'] or arguments['count']:
+        # If this is a recursive command
+        if arguments['-r']:
+            # If there are not arguments
+            if len(args) == 1:
+                # Pass the current path
+                get_diretory_count('.', True)
+            else:
+                # Else, pass the path provided by the user
+                get_diretory_count(args[1], True)
+        else:
+            # If there are not arguments
+            if len(args) == 0:
+                # Pass the current path
+                get_diretory_count('.')
+            else:
+                # Else, pass the path provided by the user
+                get_diretory_count(args[0])
     else:
         # Print the man page
         print __doc__
