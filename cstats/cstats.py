@@ -8,6 +8,7 @@ Usage:
     cstats (s | size) [-r] [<path>]
     cstats (c | count) [-r] [<path>]
     cstats (t | type) [-r] [<path>]
+    cstats (e | extension) [-r] [<path>]
     cstats (a | all) [-r] [<path>]
     cstats (-h | --help)
     cstats --version
@@ -29,7 +30,7 @@ import math
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.13'
+__version__ = '0.2.0.14'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -267,7 +268,7 @@ def get_file_types(path, recursive=False):
                     # For each file type in the map of existing types
                     for file_type in __file_types:
                         # If the file extensions is part of one of the current types
-                        if file_extension[1] in __file_types[file_type]:
+                        if file_extension[-1].lower() in __file_types[file_type]:
                             # If there is already a count for the file type
                             if file_type in current_file_types:
                                 # Increment the count by 1
@@ -301,6 +302,70 @@ def get_file_types(path, recursive=False):
 
     # Return the map of all of the types and counters
     return current_file_types
+
+
+def get_extension_usage(path, recursive=False):
+    """
+    Get a list of the number of times an extension has been used
+
+    :param recursive:
+    :param path:
+    """
+
+    # Remove the '/' from the end of the path if present
+    path = _remove_directory_slash(path)
+
+    # Create a new queue of paths
+    paths = Queue.Queue()
+    # Add the passed path
+    paths.put(path)
+
+    # The dictionary with the counts of the extensions
+    extension_count = {}
+
+    # While there are more paths to analyze
+    while not paths.empty():
+        # Get the current path
+        current_path = paths.get()
+
+        # Get the files and directories in the path
+        files = os.listdir(current_path)
+
+        # Loop through each file
+        for entry in files:
+            # If we are doing a recursive call and the current entry is a directory
+            if recursive and os.path.isdir(os.path.join(current_path, entry)):
+                # Put the new path in the paths queue
+                paths.put(current_path + '/' + entry)
+                # Continue to the next iteration of the loop
+                continue
+
+            # Split each file and extension
+            file_extension = entry.split('.')
+
+            # If the file does not have an extension
+            if len(file_extension) == 1:
+                # Continue to the next iteration of the loop
+                continue
+
+            # If there is already a count for the extension
+            if file_extension[-1].lower() in extension_count:
+                # Increment the count by 1
+                extension_count[file_extension[-1].lower()] += 1
+            else:
+                # Create a new entry with the first element
+                extension_count[file_extension[-1].lower()] = 1
+
+    # Sort the values in the map based on the counter in reverse order
+    sorted_extensions = sorted(extension_count.items(), key=operator.itemgetter(1), reverse=True)
+
+    # For each file type in the extension
+    for extension in sorted_extensions:
+        # Print the extension and count
+        print '.' + extension[0] + ' ' + str(extension[1])
+
+    # Return the map of all of the extensions and counters
+    return extension_count
 
 
 def get_directory_count(path, recursive=False):
@@ -338,7 +403,6 @@ def get_directory_count(path, recursive=False):
             if recursive and os.path.isdir(os.path.join(current_path, entry)):
                 # Put the new path in the paths queue
                 paths.put(current_path + '/' + entry)
-                # Continue to the next iteration of the loop
 
             # If the entry is a directory
             if os.path.isdir(os.path.join(current_path, entry)):
@@ -546,6 +610,34 @@ def _largest_analysis(args, docopt_arguments):
             get_largest_file(args[0])
 
 
+def _extension_analysis(args, docopt_arguments):
+    """
+    Run the extension analysis
+
+    :param args:
+    :param docopt_arguments:
+    :return:
+    """
+
+    # If this is a recursive command
+    if docopt_arguments['-r']:
+        # If there are not arguments
+        if len(args) == 1:
+            # Pass the current path
+            get_extension_usage('.', True)
+        else:
+            # Else, pass the path provided by the user
+            get_extension_usage(args[1], True)
+    else:
+        # If there are not arguments
+        if len(args) == 0:
+            # Pass the current path
+            get_extension_usage('.')
+        else:
+            # Else, pass the path provided by the user
+            get_extension_usage(args[0])
+
+
 def _all_analysis(args, docopt_arguments):
     """
     Run all analyses
@@ -573,6 +665,9 @@ def _all_analysis(args, docopt_arguments):
     print '\n' + 35 * '=' + ' t - type ' + 35 * '='
     _type_analysis(args, docopt_arguments)
 
+    print '\n' + 35 * '=' + ' e - extension ' + 35 * '='
+    _extension_analysis(args, docopt_arguments)
+
 
 # Main method
 def main():
@@ -598,6 +693,9 @@ def main():
     # If the user wants the size of the directory
     elif docopt_arguments['s'] or docopt_arguments['size']:
         _size_analysis(args, docopt_arguments)
+    # If the user wants a list of the extensions in the directory
+    elif docopt_arguments['e'] or docopt_arguments['extension']:
+        _extension_analysis(args, docopt_arguments)
     # If the user wants a list of the types of files of the directory
     elif docopt_arguments['t'] or docopt_arguments['type']:
         _type_analysis(args, docopt_arguments)
