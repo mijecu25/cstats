@@ -25,7 +25,7 @@ import Queue
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.7'
+__version__ = '0.2.0.8'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -97,8 +97,10 @@ def list_files(path):
 
 def get_size_directory(path, recursive=False):
     """
-    Get the size of the specified directory. This is the size of just the current directory. This means that the
-    folder's sizes are based on the size that they use in disk, but not the contents of it.
+    Get the size of the specified directory. The default is to do a not recursive execution. This means that
+    the size of the folders represent the size that they take in memory and the contents are not included. If you want
+    the contents of directories to be included in the analysis, set the recursive paramater to True.
+
     :param recursive:
     :param path:
     """
