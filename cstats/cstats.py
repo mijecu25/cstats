@@ -25,7 +25,7 @@ import Queue
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.6'
+__version__ = '0.2.0.7'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -228,6 +228,9 @@ def main():
     # Get the arguments from docopt
     arguments = docopt(__doc__, version=__cstats_version)
 
+    print 'cstats started analyzing on ' + time.strftime("%c") + '\n'
+    start_time = time.time()
+
     # If the user wants to list the files
     if arguments['ls'] or arguments['list']:
         # If the user did not specify a path
@@ -268,6 +271,9 @@ def main():
         # Print the man page
         print __doc__
 
+    end_time = time.time()
+
+    print '\nExecution took ' + str(round(end_time - start_time, 4)) + ' seconds'
 
 # Start the program
 if __name__ == '__main__':
