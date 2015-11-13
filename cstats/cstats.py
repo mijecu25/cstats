@@ -4,12 +4,13 @@ cstats provides statistic and information about your directories
 
 Usage:
     cstats (ls | list) [<path>]
-    cstats (s | size) [<path>]
+    cstats (s | size) [-r] [<path>]
     cstats (t | type) [<path>]
     cstats (-h | --help)
     cstats --version
 
 Options:
+    -r  Recursive call. Used to apply the command to the directories of the path
     -h --help  Show this screen.
     --version  Show version.
 
@@ -19,11 +20,12 @@ import sys as system
 import time
 import os
 import operator
+import Queue
 
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.4'
+__version__ = '0.2.0.5'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -93,31 +95,51 @@ def list_files(path):
             'modified ' + time.ctime(file_info.st_mtime).ljust(50)
 
 
-def get_size_directory(path):
+def get_size_directory(path, recursive=False):
     """
     Get the size of the specified directory. This is the size of just the current directory. This means that the
     folder's sizes are based on the size that they use in disk, but not the contents of it.
+    :param recursive:
     :param path:
     """
 
-    # Get the files and directories in the path
-    files = os.listdir(path)
+    # Create a new queue of paths
+    paths = Queue.Queue()
+    # Add the passed path
+    paths.put(path)
 
     # Variable for the total size
     total_size = 0
 
-    # Loop through each file
-    for entry in files:
-        # Get the information of the file
-        file_info = _get_entry_info(path, entry)
+    while not paths.empty():
+        # Get the current path
+        current_path = paths.get()
 
-        # If there is no file info
-        if file_info is None:
-            # Just jump to the next iteration of the loop
-            continue
+        print current_path
 
-        # Add the size of the current file to the total
-        total_size += file_info.st_size
+        # Get the files and directories in the path
+        files = os.listdir(current_path)
+
+        # Loop through each file
+        for entry in files:
+            # If we are doing a recursive call and the current entry is a directory
+            if recursive and os.path.isdir(os.path.join(current_path, entry)):
+                print current_path + '/' + entry
+                # Put the new path in the paths queue
+                paths.put(current_path + '/' + entry)
+                # Continue to the next iteration of the loop
+                continue
+
+            # Get the information of the file
+            file_info = _get_entry_info(current_path, entry)
+
+            # If there is no file info
+            if file_info is None:
+                # Just jump to the next iteration of the loop
+                continue
+
+            # Add the size of the current file to the total
+            total_size += file_info.st_size
 
     # Print the total size of the current directory
     print 'Size of current directory ' + str(total_size) + ' bytes'
@@ -200,14 +222,9 @@ def main():
 
     # Get optional arguments for path
     args = system.argv[2:]
-    # print 'Arguments: ' + str(args)
 
     # Get the arguments from docopt
     arguments = docopt(__doc__, version=__cstats_version)
-
-    # print 'Docopt arguments: ' + str(arguments)
-
-    # print '\n'
 
     # If the user wants to list the files
     if arguments['ls'] or arguments['list']:
@@ -220,12 +237,23 @@ def main():
             list_files(args[0])
     # If the user wants the size of the directory
     elif arguments['s'] or arguments['size']:
-        if len(args) == 0:
-            # Pass the current path
-            get_size_directory('.')
+        # If this is a recursive command
+        if arguments['-r']:
+            # If there are not arguments
+            if len(args) == 0:
+                # Pass the current path
+                get_size_directory('.', True)
+            else:
+                # Else, pass the path provided by the user
+                get_size_directory(args[1], True)
         else:
-            # Else, pass the path provided by the user
-            get_size_directory(args[0])
+            # If there are not arguments
+            if len(args) == 0:
+                # Pass the current path
+                get_size_directory('.')
+            else:
+                # Else, pass the path provided by the user
+                get_size_directory(args[0])
     # If the user wants alits of the types of files of the directory
     elif arguments['t'] or arguments['type']:
         if len(args) == 0:
