@@ -12,12 +12,12 @@ cstats
    
 .. image:: https://img.shields.io/pypi/status/cstats.svg   
    :target: https://pypi.python.org/pypi/cstats
+
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg 
+   :target: https://raw.githubusercontent.com/mijecu25/stats/master/LICENSE
    
 .. image:: https://img.shields.io/pypi/dm/cstats.svg
    :target: https://pypi.python.org/pypi/cstats
-   
-.. image:: https://img.shields.io/badge/license-MIT-blue.svg 
-   :target: https://raw.githubusercontent.com/mijecu25/stats/master/LICENSE
    
 cstats generates information about your file directory
 
