@@ -25,7 +25,7 @@ import Queue
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.5'
+__version__ = '0.2.0.6'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -53,13 +53,13 @@ def _get_entry_info(path, entry):
     specified path.
     """
 
-    # If the path ends with a '/'
-    if path[-1:] == '/':
-        # Remove the '/'
-        path = path[:-1]
+    # If the path does not end with a '/'
+    if path[-1:] != '/':
+        # Add the '/'
+        path += '/'
 
     # Get information and attributes from the entry in the path
-    info = os.stat(path + '/' + entry)
+    info = os.stat(path + entry)
 
     # Return the information
     return info
@@ -103,6 +103,11 @@ def get_size_directory(path, recursive=False):
     :param path:
     """
 
+    # If the path ends with a '/'
+    if path[-1:] == '/':
+        # Remove the '/'
+        path = path[:-1]
+
     # Create a new queue of paths
     paths = Queue.Queue()
     # Add the passed path
@@ -115,8 +120,6 @@ def get_size_directory(path, recursive=False):
         # Get the current path
         current_path = paths.get()
 
-        print current_path
-
         # Get the files and directories in the path
         files = os.listdir(current_path)
 
@@ -124,7 +127,6 @@ def get_size_directory(path, recursive=False):
         for entry in files:
             # If we are doing a recursive call and the current entry is a directory
             if recursive and os.path.isdir(os.path.join(current_path, entry)):
-                print current_path + '/' + entry
                 # Put the new path in the paths queue
                 paths.put(current_path + '/' + entry)
                 # Continue to the next iteration of the loop
@@ -240,7 +242,7 @@ def main():
         # If this is a recursive command
         if arguments['-r']:
             # If there are not arguments
-            if len(args) == 0:
+            if len(args) == 1:
                 # Pass the current path
                 get_size_directory('.', True)
             else:
