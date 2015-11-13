@@ -1,12 +1,13 @@
 """CSTATS
 
-cstats provides statistic and information about your directories
+cstats provides statistic and information about your directories.
 
 Usage:
     cstats (ls | list) [<path>]
     cstats (s | size) [-r] [<path>]
     cstats (c | count) [-r] [<path>]
     cstats (t | type) [-r] [<path>]
+    cstats (a | all) [-r] [<path>]
     cstats (-h | --help)
     cstats --version
 
@@ -26,7 +27,7 @@ import Queue
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.10'
+__version__ = '0.2.0.11'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -108,7 +109,7 @@ def list_files(path):
             continue
 
         # Print name, size, created time, modified time
-        print entry.ljust(20),\
+        print entry.ljust(40),\
             'size ' + str(file_info.st_size).ljust(10),\
             'modified ' + time.ctime(file_info.st_mtime).ljust(50)
 
@@ -308,6 +309,120 @@ def get_diretory_count(path, recursive=False):
     return total_count
 
 
+def _list_analysis(args):
+    """
+
+    :param args:
+    :return:
+    """
+    # If the user did not specify a path
+    if len(args) == 0:
+        # Pass the current path
+        list_files('.')
+    else:
+        # Else, pass the path provided by the user
+        list_files(args[-1])
+
+
+def _size_analysis(args, docopt_arguments):
+    """
+
+    :param args:
+    :param docopt_arguments:
+    :return:
+    """
+    # If this is a recursive command
+    if docopt_arguments['-r']:
+        # If there are not arguments
+        if len(args) == 1:
+            # Pass the current path
+            get_size_directory('.', True)
+        else:
+            # Else, pass the path provided by the user
+            get_size_directory(args[1], True)
+    else:
+        # If there are not arguments
+        if len(args) == 0:
+            # Pass the current path
+            get_size_directory('.')
+        else:
+            # Else, pass the path provided by the user
+            get_size_directory(args[0])
+
+
+def _type_analysis(args, docopt_arguments):
+    """
+
+    :param args:
+    :param docopt_arguments:
+    :return:
+    """
+    # If this is a recursive command
+    if docopt_arguments['-r']:
+        # If there are not arguments
+        if len(args) == 1:
+            # Pass the current path
+            get_file_types('.', True)
+        else:
+            # Else, pass the path provided by the user
+            get_file_types(args[1], True)
+    else:
+        # If there are not arguments
+        if len(args) == 0:
+            # Pass the current path
+            get_file_types('.')
+        else:
+            # Else, pass the path provided by the user
+            get_file_types(args[0])
+
+
+def _count_analysis(args, docopt_arguments):
+    """
+
+    :param args:
+    :param docopt_arguments:
+    :return:
+    """
+    # If this is a recursive command
+    if docopt_arguments['-r']:
+        # If there are not arguments
+        if len(args) == 1:
+            # Pass the current path
+            get_diretory_count('.', True)
+        else:
+            # Else, pass the path provided by the user
+            get_diretory_count(args[1], True)
+    else:
+        # If there are not arguments
+        if len(args) == 0:
+            # Pass the current path
+            get_diretory_count('.')
+        else:
+            # Else, pass the path provided by the user
+            get_diretory_count(args[0])
+
+
+def _all_analysis(args, docopt_arguments):
+    """
+
+    :param args:
+    :param docopt_arguments:
+    :return:
+    """
+
+    print 5 * '=' + ' ls - list ' + 5 * '='
+    _list_analysis(args)
+
+    print '\n' + 5 * '=' + ' s - size ' + 5 * '='
+    _size_analysis(args, docopt_arguments)
+
+    print '\n' + 5 * '=' + ' c - count ' + 5 * '='
+    _count_analysis(args, docopt_arguments)
+
+    print '\n' + 5 * '=' + ' t - type ' + 5 * '='
+    _type_analysis(args, docopt_arguments)
+
+
 # Main method
 def main():
     """
@@ -318,77 +433,26 @@ def main():
     args = system.argv[2:]
 
     # Get the arguments from docopt
-    arguments = docopt(__doc__, version=__cstats_version)
+    docopt_arguments = docopt(__doc__, version=__cstats_version)
 
     print 'cstats started analyzing on ' + time.strftime("%c") + '\n'
     start_time = time.time()
 
     # If the user wants to list the files
-    if arguments['ls'] or arguments['list']:
-        # If the user did not specify a path
-        if len(args) == 0:
-            # Pass the current path
-            list_files('.')
-        else:
-            # Else, pass the path provided by the user
-            list_files(args[0])
+    if docopt_arguments['ls'] or docopt_arguments['list']:
+        _list_analysis(args)
+    # If the user wants to run a full analysis of the directory
+    elif docopt_arguments['a'] or docopt_arguments['all']:
+        _all_analysis(args, docopt_arguments)
     # If the user wants the size of the directory
-    elif arguments['s'] or arguments['size']:
-        # If this is a recursive command
-        if arguments['-r']:
-            # If there are not arguments
-            if len(args) == 1:
-                # Pass the current path
-                get_size_directory('.', True)
-            else:
-                # Else, pass the path provided by the user
-                get_size_directory(args[1], True)
-        else:
-            # If there are not arguments
-            if len(args) == 0:
-                # Pass the current path
-                get_size_directory('.')
-            else:
-                # Else, pass the path provided by the user
-                get_size_directory(args[0])
+    elif docopt_arguments['s'] or docopt_arguments['size']:
+        _size_analysis(args, docopt_arguments)
     # If the user wants a lits of the types of files of the directory
-    elif arguments['t'] or arguments['type']:
-        # If this is a recursive command
-        if arguments['-r']:
-            # If there are not arguments
-            if len(args) == 1:
-                # Pass the current path
-                get_file_types('.', True)
-            else:
-                # Else, pass the path provided by the user
-                get_file_types(args[1], True)
-        else:
-            # If there are not arguments
-            if len(args) == 0:
-                # Pass the current path
-                get_file_types('.')
-            else:
-                # Else, pass the path provided by the user
-                get_file_types(args[0])
+    elif docopt_arguments['t'] or docopt_arguments['type']:
+        _type_analysis(args, docopt_arguments)
     # If the user wants to count the directories and files inside a directory
-    elif arguments['c'] or arguments['count']:
-        # If this is a recursive command
-        if arguments['-r']:
-            # If there are not arguments
-            if len(args) == 1:
-                # Pass the current path
-                get_diretory_count('.', True)
-            else:
-                # Else, pass the path provided by the user
-                get_diretory_count(args[1], True)
-        else:
-            # If there are not arguments
-            if len(args) == 0:
-                # Pass the current path
-                get_diretory_count('.')
-            else:
-                # Else, pass the path provided by the user
-                get_diretory_count(args[0])
+    elif docopt_arguments['c'] or docopt_arguments['count']:
+        _count_analysis(args, docopt_arguments)
     else:
         # Print the man page
         print __doc__
