@@ -6,7 +6,7 @@ Usage:
     cstats (ls | list) [<path>]
     cstats (s | size) [-r] [<path>]
     cstats (c | count) [-r] [<path>]
-    cstats (t | type) [<path>]
+    cstats (t | type) [-r] [<path>]
     cstats (-h | --help)
     cstats --version
 
@@ -26,7 +26,7 @@ import Queue
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.9'
+__version__ = '0.2.0.10'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -64,6 +64,23 @@ def _get_entry_info(path, entry):
 
     # Return the information
     return info
+
+
+def _remove_directory_slash(path):
+    """
+    Remove the '/' at the end of the path if present.
+
+    :param path:
+    :return:
+    """
+
+    # If the path ends with a '/'
+    if path[-1:] == '/':
+        # Remove the '/'
+        path = path[:-1]
+
+    # Return the path
+    return path
 
 
 def list_files(path):
@@ -106,10 +123,8 @@ def get_size_directory(path, recursive=False):
     :param path:
     """
 
-    # If the path ends with a '/'
-    if path[-1:] == '/':
-        # Remove the '/'
-        path = path[:-1]
+    # Remove the '/' from the end of the path if present
+    path = _remove_directory_slash(path)
 
     # Create a new queue of paths
     paths = Queue.Queue()
@@ -119,6 +134,7 @@ def get_size_directory(path, recursive=False):
     # Variable for the total size
     total_size = 0
 
+    # While there are more paths to analyze
     while not paths.empty():
         # Get the current path
         current_path = paths.get()
@@ -153,57 +169,75 @@ def get_size_directory(path, recursive=False):
     return total_size
 
 
-def get_file_types(path):
+def get_file_types(path, recursive=False):
     """
     Get a list of the file types of the specified directory
     :param path:
     """
 
-    # Get the files and directories in the path
-    files = os.listdir(path)
+    # Remove the '/' from the end of the path if present
+    path = _remove_directory_slash(path)
+
+    # Create a new queue of paths
+    paths = Queue.Queue()
+    # Add the passed path
+    paths.put(path)
 
     # The dictionary with the counts of the file types
     current_file_types = {'Other': 0, 'Folders': 0}
 
-    # Loop through each file
-    for entry in files:
-        # Split each file and extension
-        file_extension = entry.split('.')
+    # While there are more paths to analyze
+    while not paths.empty():
+        # Get the current path
+        current_path = paths.get()
 
-        # Variable to check if we added to an existing type
-        not_found = True
+        # Get the files and directories in the path
+        files = os.listdir(current_path)
 
-        # If the file is not a directory
-        if not os.path.isdir(os.path.join(path, entry)):
-            # If the file does not have an extension
-            if len(file_extension) == 1:
-                # The file is of type other
-                current_file_types['Other'] += 1
-            else:
-                # For each file type in the map of existing types
-                for file_type in __file_types:
-                    # If the file extensions is part of one of the current types
-                    if file_extension[1] in __file_types[file_type]:
-                        # If there is already a count for the file type
-                        if file_type in current_file_types:
-                            # Increment the count by 1
-                            current_file_types[file_type] += 1
-                        else:
-                            # Create a new entry with the first element
-                            current_file_types[file_type] = 1
+        # Loop through each file
+        for entry in files:
+            # If we are doing a recursive call and the current entry is a directory
+            if recursive and os.path.isdir(os.path.join(current_path, entry)):
+                # Put the new path in the paths queue
+                paths.put(current_path + '/' + entry)
 
-                        # Since we increased the count, we found something
-                        not_found = False
-                        # Do not keep searching in other file types
-                        break
+            # Split each file and extension
+            file_extension = entry.split('.')
 
-                # If we did not find anything associated to the file extension
-                if not_found:
+            # Variable to check if we added to an existing type
+            not_found = True
+
+            # If the file is not a directory
+            if not os.path.isdir(os.path.join(current_path, entry)):
+                # If the file does not have an extension
+                if len(file_extension) == 1:
                     # The file is of type other
                     current_file_types['Other'] += 1
-        else:
-            # The current entry is a folder
-            current_file_types['Folders'] += 1
+                else:
+                    # For each file type in the map of existing types
+                    for file_type in __file_types:
+                        # If the file extensions is part of one of the current types
+                        if file_extension[1] in __file_types[file_type]:
+                            # If there is already a count for the file type
+                            if file_type in current_file_types:
+                                # Increment the count by 1
+                                current_file_types[file_type] += 1
+                            else:
+                                # Create a new entry with the first element
+                                current_file_types[file_type] = 1
+
+                            # Since we increased the count, we found something
+                            not_found = False
+                            # Do not keep searching in other file types
+                            break
+
+                    # If we did not find anything associated to the file extension
+                    if not_found:
+                        # The file is of type other
+                        current_file_types['Other'] += 1
+            else:
+                # The current entry is a folder
+                current_file_types['Folders'] += 1
 
     # Sort the values in the map based on the counter in reverse order
     sorted_types = sorted(current_file_types.items(), key=operator.itemgetter(1), reverse=True)
@@ -229,10 +263,8 @@ def get_diretory_count(path, recursive=False):
     :param path:
     """
 
-    # If the path ends with a '/'
-    if path[-1:] == '/':
-        # Remove the '/'
-        path = path[:-1]
+    # Remove the '/' from the end of the path if present
+    path = _remove_directory_slash(path)
 
     # Create a new queue of paths
     paths = Queue.Queue()
@@ -242,6 +274,7 @@ def get_diretory_count(path, recursive=False):
     # Variable for the total count
     total_count = {'Directories': 0, 'Files': 0}
 
+    # While there are more paths to analyze
     while not paths.empty():
         # Get the current path
         current_path = paths.get()
@@ -320,12 +353,23 @@ def main():
                 get_size_directory(args[0])
     # If the user wants a lits of the types of files of the directory
     elif arguments['t'] or arguments['type']:
-        if len(args) == 0:
-            # Pass the current path
-            get_file_types('.')
+        # If this is a recursive command
+        if arguments['-r']:
+            # If there are not arguments
+            if len(args) == 1:
+                # Pass the current path
+                get_file_types('.', True)
+            else:
+                # Else, pass the path provided by the user
+                get_file_types(args[1], True)
         else:
-            # Else, pass the path provided by the user
-            get_file_types(args[0])
+            # If there are not arguments
+            if len(args) == 0:
+                # Pass the current path
+                get_file_types('.')
+            else:
+                # Else, pass the path provided by the user
+                get_file_types(args[0])
     # If the user wants to count the directories and files inside a directory
     elif arguments['c'] or arguments['count']:
         # If this is a recursive command
