@@ -9,4 +9,4 @@ install:
   - pip install .
 
 script:
-  - python setup.py
+  - python setup.py --help
