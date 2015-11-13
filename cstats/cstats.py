@@ -23,7 +23,7 @@ import operator
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.3'
+__version__ = '0.2.0.4'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -95,7 +95,8 @@ def list_files(path):
 
 def get_size_directory(path):
     """
-    Get the size of the specified directory
+    Get the size of the specified directory. This is the size of just the current directory. This means that the
+    folder's sizes are based on the size that they use in disk, but not the contents of it.
     :param path:
     """
 
@@ -145,29 +146,34 @@ def get_file_types(path):
         # Variable to check if we added to an existing type
         not_found = True
 
-        # If the file has a name and extension or it begins with a dot
-        if len(file_extension) == 2 or entry[0] == '.':
-            # For each file type in the map of existing types
-            for file_type in __file_types:
-                # If the file extensions is part of one of the current types
-                if file_extension[1] in __file_types[file_type]:
-                    # If there is already a count for the file type
-                    if file_type in current_file_types:
-                        # Increment the count by 1
-                        current_file_types[file_type] += 1
-                    else:
-                        # Create a new entry with the first element
-                        current_file_types[file_type] = 1
-
-                    # Since we increased the count, we found something
-                    not_found = False
-                    # Do not keep searching in other file types
-                    break
-
-            # If we did not find anything associated to the file extension
-            if not_found:
+        # If the file is not a directory
+        if not os.path.isdir(os.path.join(path, entry)):
+            # If the file does not have an extension
+            if len(file_extension) == 1:
                 # The file is of type other
                 current_file_types['Other'] += 1
+            else:
+                # For each file type in the map of existing types
+                for file_type in __file_types:
+                    # If the file extensions is part of one of the current types
+                    if file_extension[1] in __file_types[file_type]:
+                        # If there is already a count for the file type
+                        if file_type in current_file_types:
+                            # Increment the count by 1
+                            current_file_types[file_type] += 1
+                        else:
+                            # Create a new entry with the first element
+                            current_file_types[file_type] = 1
+
+                        # Since we increased the count, we found something
+                        not_found = False
+                        # Do not keep searching in other file types
+                        break
+
+                # If we did not find anything associated to the file extension
+                if not_found:
+                    # The file is of type other
+                    current_file_types['Other'] += 1
         else:
             # The current entry is a folder
             current_file_types['Folders'] += 1
