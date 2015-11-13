@@ -4,6 +4,7 @@ cstats provides statistic and information about your directories.
 
 Usage:
     cstats (ls | list) [<path>]
+    cstats (l | largest) [-r] [<path>]
     cstats (s | size) [-r] [<path>]
     cstats (c | count) [-r] [<path>]
     cstats (t | type) [-r] [<path>]
@@ -28,7 +29,7 @@ import math
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.12'
+__version__ = '0.2.0.13'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -155,7 +156,7 @@ def list_files(path):
             continue
 
         # Print name, size, created time, modified time
-        print entry.ljust(40),\
+        print entry.ljust(32),\
             'size ' + str(file_info.st_size).ljust(10),\
             'modified ' + time.ctime(file_info.st_mtime).ljust(50)
 
@@ -302,7 +303,7 @@ def get_file_types(path, recursive=False):
     return current_file_types
 
 
-def get_diretory_count(path, recursive=False):
+def get_directory_count(path, recursive=False):
     """
     Get the count of the number of files and directories in the specified directory. The default is to do a non
     recursive execution. This means that the content of the directories is no included in the analysis. If you want
@@ -357,6 +358,68 @@ def get_diretory_count(path, recursive=False):
     return total_count
 
 
+def get_largest_file(path, recursive=False):
+    """
+
+    :param recursive:
+    :param path:
+    :return:
+    """
+
+    # Remove the '/' from the end of the path if present
+    path = _remove_directory_slash(path)
+
+    # Create a new queue of paths
+    paths = Queue.Queue()
+    # Add the passed path
+    paths.put(path)
+
+    # Variables to keep track of the largest file
+    largest_path = ''
+    largest_name = ''
+    largest_size = 0
+
+    # While there are more paths to analyze
+    while not paths.empty():
+        # Get the current path
+        current_path = paths.get()
+
+        # Get the files and directories in the path
+        files = os.listdir(current_path)
+
+        # Loop through each file
+        for entry in files:
+            # If we are doing a recursive call and the current entry is a directory
+            if recursive and os.path.isdir(os.path.join(current_path, entry)):
+                # Put the new path in the paths queue
+                paths.put(current_path + '/' + entry)
+                # Continue to the next iteration of the loop
+                continue
+
+            # Get some file information
+            file_info = _get_entry_info(current_path, entry)
+
+            # If the size of the current file is larger than the largest
+            if file_info.st_size > largest_size:
+                # Get the size
+                largest_size = file_info.st_size
+                # Get the name
+                largest_name = entry
+                # Get the path
+                largest_path = current_path
+
+    # If there is no file in the directory
+    if largest_size == 0:
+        print 'The directory you specified only has directories'
+
+        return
+
+    # Print the information about the largest file
+    print 'Largest file \"' + str(largest_name) + '\"'
+    print 'Size ' + _format_size(largest_size)
+    print 'Path ' + str(largest_path + '/')
+
+
 def _list_analysis(args):
     """
     Run the list analysis.
@@ -364,6 +427,7 @@ def _list_analysis(args):
     :param args:
     :return:
     """
+
     # If the user did not specify a path
     if len(args) == 0:
         # Pass the current path
@@ -440,38 +504,73 @@ def _count_analysis(args, docopt_arguments):
         # If there are not arguments
         if len(args) == 1:
             # Pass the current path
-            get_diretory_count('.', True)
+            get_directory_count('.', True)
         else:
             # Else, pass the path provided by the user
-            get_diretory_count(args[1], True)
+            get_directory_count(args[1], True)
     else:
         # If there are not arguments
         if len(args) == 0:
             # Pass the current path
-            get_diretory_count('.')
+            get_directory_count('.')
         else:
             # Else, pass the path provided by the user
-            get_diretory_count(args[0])
+            get_directory_count(args[0])
 
 
-def _all_analysis(args, docopt_arguments):
+def _largest_analysis(args, docopt_arguments):
     """
+    Run the largest analysis
 
     :param args:
     :param docopt_arguments:
     :return:
     """
 
-    print 5 * '=' + ' ls - list ' + 5 * '='
-    _list_analysis(args)
+    # If this is a recursive command
+    if docopt_arguments['-r']:
+        # If there are not arguments
+        if len(args) == 1:
+            # Pass the current path
+            get_largest_file('.', True)
+        else:
+            # Else, pass the path provided by the user
+            get_largest_file(args[1], True)
+    else:
+        # If there are not arguments
+        if len(args) == 0:
+            # Pass the current path
+            get_largest_file('.')
+        else:
+            # Else, pass the path provided by the user
+            get_largest_file(args[0])
 
-    print '\n' + 5 * '=' + ' s - size ' + 5 * '='
+
+def _all_analysis(args, docopt_arguments):
+    """
+    Run all analyses
+
+    :param args:
+    :param docopt_arguments:
+    :return:
+    """
+
+    print 35 * '=' + ' ls - list ' + 35 * '='
+    if docopt_arguments['-r']:
+        _list_analysis(args[1:])
+    else:
+        _list_analysis(args)
+
+    print '\n' + 35 * '=' + ' l - largest ' + 35 * '='
+    _largest_analysis(args, docopt_arguments)
+
+    print '\n' + 35 * '=' + ' s - size ' + 35 * '='
     _size_analysis(args, docopt_arguments)
 
-    print '\n' + 5 * '=' + ' c - count ' + 5 * '='
+    print '\n' + 35 * '=' + ' c - count ' + 35 * '='
     _count_analysis(args, docopt_arguments)
 
-    print '\n' + 5 * '=' + ' t - type ' + 5 * '='
+    print '\n' + 35 * '=' + ' t - type ' + 35 * '='
     _type_analysis(args, docopt_arguments)
 
 
@@ -499,12 +598,15 @@ def main():
     # If the user wants the size of the directory
     elif docopt_arguments['s'] or docopt_arguments['size']:
         _size_analysis(args, docopt_arguments)
-    # If the user wants a lits of the types of files of the directory
+    # If the user wants a list of the types of files of the directory
     elif docopt_arguments['t'] or docopt_arguments['type']:
         _type_analysis(args, docopt_arguments)
     # If the user wants to count the directories and files inside a directory
     elif docopt_arguments['c'] or docopt_arguments['count']:
         _count_analysis(args, docopt_arguments)
+    # If the user wants the largest file in the directory
+    elif docopt_arguments['l'] or docopt_arguments['largest']:
+        _largest_analysis(args, docopt_arguments)
     else:
         # Print the man page
         print __doc__
