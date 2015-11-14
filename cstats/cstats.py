@@ -30,7 +30,7 @@ import math
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.1.1'
+__version__ = '0.2.1.2'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -85,7 +85,7 @@ def _format_size(size):
         return formatted
 
     # Check how many kilobytes there are
-    kilo_bytes = round(size / math.pow(10, 9), 3)
+    kilo_bytes = round(size / math.pow(10, 3), 3)
 
     # If there are kilobytes
     if kilo_bytes >= 0.1:
