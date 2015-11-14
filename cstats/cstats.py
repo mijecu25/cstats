@@ -3,15 +3,15 @@
 cstats provides statistic and information about your directories.
 
 Usage:
-    cstats (ls | list) [<path>]
-    cstats (l | largest) [-r] [<path>]
-    cstats (s | size) [-r] [<path>]
-    cstats (c | count) [-r] [<path>]
-    cstats (t | type) [-r] [<path>]
-    cstats (e | extension) [-r] [<path>]
-    cstats (a | all) [-r] [<path>]
-    cstats (-h | --help)
-    cstats --version
+    cst (ls | list) [<path>]
+    cst (l | largest) [-r] [<path>]
+    cst (s | size) [-r] [<path>]
+    cst (c | count) [-r] [<path>]
+    cst (t | type) [-r] [<path>]
+    cst (e | extension) [-r] [<path>]
+    cst (a | all) [-r] [<path>]
+    cst (-h | --help)
+    cst --version
 
 Options:
     -r  Recursive call. Used to apply the command to the directories of the path
