@@ -7,7 +7,26 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/mijecu25/stats/master/LICENSE)
 [![PyPI](https://img.shields.io/pypi/dm/cstats.svg)](https://pypi.python.org/pypi/cstats)
 
-cstats generates information about your file directory
+
+cstats provides statistics and information about your directories.
+
+```
+Usage:
+    cst (ls | list) [<path>]
+    cst (l | largest) [-r] [<path>]
+    cst (s | size) [-r] [<path>]
+    cst (c | count) [-r] [<path>]
+    cst (t | type) [-r] [<path>]
+    cst (e | extension) [-r] [<path>]
+    cst (a | all) [-r] [<path>]
+    cst (-h | --help)
+    cst --version
+
+Options:
+    -r  Recursive call. Used to apply the command to the directories of the path
+    -h --help  Show this screen.
+    --version  Show version.
+```
 
 ===========
 
