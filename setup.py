@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='cstats',
-    version='0.1.2',
-    description='Cstats generates information about your file directory.',
+    version='0.2.0',
+    description='cstats generates information about your file directory.',
     long_description=open('README.rst').read(),
     url='https://github.com/mijecu25/cstats',
     author='Miguel Velez',
@@ -17,7 +17,8 @@ setup(
     keywords=[
         'stats',
         'tool',
-        'command line'
+        'command line',
+        'file system'
     ],
     packages=find_packages(),
     install_requires=[
