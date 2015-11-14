@@ -30,7 +30,7 @@ import math
 from docopt import docopt
 
 __author__ = 'Miguel Velez - miguelvelezmj25'
-__version__ = '0.2.0.14'
+__version__ = '0.2.0.15'
 
 __cstats_version = 'cstats version "' + __version__ + '"\n' \
                                                       'author "' + __author__ + '"'
@@ -157,7 +157,7 @@ def list_files(path):
             continue
 
         # Print name, size, created time, modified time
-        print entry.ljust(32),\
+        print entry.ljust(50),\
             'size ' + str(file_info.st_size).ljust(10),\
             'modified ' + time.ctime(file_info.st_mtime).ljust(50)
 
