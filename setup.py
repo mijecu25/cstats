@@ -22,7 +22,7 @@ setup(
     ],
     packages=find_packages(),
     install_requires=[
-        'docopt>=0.6.1',
+        'docopt>=0.6.2',
     ],
     entry_points={
         'console_scripts': [
