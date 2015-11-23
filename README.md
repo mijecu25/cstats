@@ -28,7 +28,7 @@ Options:
     --version  Show version.
 ```
 
-===========
+## License
 
 The MIT License (MIT)
 
